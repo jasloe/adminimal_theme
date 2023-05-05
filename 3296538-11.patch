@@ -1,0 +1,35 @@
+diff --git a/adminimal_theme.info.yml b/adminimal_theme.info.yml
+index 26d32f9..0b9c042 100644
+--- a/adminimal_theme.info.yml
++++ b/adminimal_theme.info.yml
+@@ -1,7 +1,7 @@
+ name: Adminimal
+ type: theme
+ description: 'Drupal administration theme with modern minimalist design.'
+-core_version_requirement: ^8.8 || ^9
++core_version_requirement: ^8.8 || ^9 || ^10
+ base theme: seven
+ 
+ libraries:
+diff --git a/adminimal_theme.theme b/adminimal_theme.theme
+index 9978135..221c7e5 100644
+--- a/adminimal_theme.theme
++++ b/adminimal_theme.theme
+@@ -42,11 +42,14 @@ function adminimal_theme_form_system_theme_settings_alter(&$form, FormStateInter
+ 
+   // Get adminimal theme path.
+   global $base_url;
+-  $adminimal_path = drupal_get_path('theme', 'adminimal_theme');
++  $adminimal_path = \Drupal::service('extension.list.theme')->getPath('adminimal_theme');
+   $old_css_path = $adminimal_path . '/css/custom.css';
+   $custom_css_path = 'public://adminimal-custom.css';
+-  $custom_css_dir = str_replace($base_url . '/', "", file_create_url($custom_css_path));
+-  $custom_css_url = file_create_url($custom_css_path);
++  $custom_css_dir = '';
++  if (\Drupal::hasService('file_url_generator')) {
++    $custom_css_url = \Drupal::service('file_url_generator')->generateAbsoluteString($custom_css_path);
++    $custom_css_dir = str_replace($base_url . '/', "", $custom_css_url);
++  }
+ 
+   // Try to create the adminimal-custom.css file automatically.
+   if (!file_exists($custom_css_path)) {
